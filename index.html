@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Timer App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .app-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .mini-mode-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mini-mode-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .add-task-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .add-task-section h2 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .task-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .task-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .task-input:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3);
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .time-input-group {
+            flex: 1;
+        }
+
+        .time-input-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+            margin-bottom: 4px;
+        }
+
+        .time-input-group input {
+            width: 100%;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .time-input-group input:focus {
+            outline: none;
+            border-color: #a78bfa;
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .add-btn:active {
+            transform: translateY(0);
+        }
+
+        .tasks-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .task-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .task-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .delete-btn {
+            padding: 8px;
+            background: rgba(239, 68, 68, 0.2);
+            border: none;
+            border-radius: 8px;
+            color: #fca5a5;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        .timer-display {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .timer-running {
+            color: #93c5fd;
+        }
+
+        .timer-complete {
+            color: #86efac;
+        }
+
+        .timer-overtime {
+            color: #fca5a5;
+        }
+
+        .timer-idle {
+            color: white;
+        }
+
+        .overtime-banner {
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            color: #fca5a5;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #a78bfa 0%, #ec4899 100%);
+            border-radius: 999px;
+            transition: width 1s;
+        }
+
+        .progress-fill-overtime {
+            background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .notes-section {
+            margin-bottom: 16px;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.875rem;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .notes-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .notes-textarea:focus {
+            outline: none;
+            border-color: #a78bfa;
+        }
+
+        .notes-display {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            word-break: break-word;
+        }
+
+        .notes-display:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .notes-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .notes-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .save-note-btn {
+            margin-top: 8px;
+            padding: 8px 16px;
+            background: rgba(167, 139, 250, 0.3);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .save-note-btn:hover {
+            background: rgba(167, 139, 250, 0.4);
+        }
+
+        .task-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .start-btn {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+        }
+
+        .start-btn:hover {
+            background: rgba(34, 197, 94, 0.3);
+        }
+
+        .pause-btn {
+            background: rgba(234, 179, 8, 0.2);
+            color: #fde047;
+        }
+
+        .pause-btn:hover {
+            background: rgba(234, 179, 8, 0.3);
+        }
+
+        .done-btn {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+        }
+
+        .done-btn:hover {
+            background: rgba(16, 185, 129, 0.3);
+        }
+
+        .reset-btn {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+        }
+
+        .reset-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .complete-message {
+            margin-top: 16px;
+            text-align: center;
+            color: #86efac;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            padding: 32px;
+        }
+
+        /* Mini Mode Styles */
+        .mini-mode-container {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .mini-card {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .mini-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .mini-header h2 {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .maximize-btn {
+            padding: 8px;
+            background: #334155;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .maximize-btn:hover {
+            background: #475569;
+        }
+
+        .mini-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mini-task-card {
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .mini-task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .mini-task-title {
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mini-control-btn {
+            padding: 6px;
+            background: #475569;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: all 0.3s;
+        }
+
+        .mini-control-btn:hover {
+            background: #64748b;
+        }
+
+        .mini-timer {
+            font-size: 1.75rem;
+            font-weight: bold;
+        }
+
+        .mini-overtime-label {
+            font-size: 0.75rem;
+            color: #fca5a5;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            
+            .app-card {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .timer-display {
+                font-size: 2.5rem;
+            }
+
+            .control-btn {
+                min-width: 100px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        // State management
+        let state = {
+            tasks: [],
+            miniMode: false,
+            editingNoteId: null,
+            halfwayAlerted: new Set()
+        };
+
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        // Timer interval - only updates task timer displays
+        setInterval(() => {
+            let hasChanges = false;
+            
+            state.tasks = state.tasks.map(task => {
+                if (task.isRunning) {
+                    const newTimeLeft = task.timeLeft - 1;
+                    hasChanges = true;
+                    
+                    // Halfway alert
+                    const halfwayPoint = Math.floor(task.totalTime / 2);
+                    if (newTimeLeft === halfwayPoint && !state.halfwayAlerted.has(task.id)) {
+                        state.halfwayAlerted.add(task.id);
+                        playSound();
+                        if ('Notification' in window && Notification.permission === 'granted') {
+                            new Notification('Task Halfway Complete!', {
+                                body: `${task.title} is 50% done. Keep going!`,
+                                icon: '⏱️'
+                            });
+                        }
+                    }
+                    
+                    // Timer completion
+                    if (newTimeLeft === 0 && task.timeLeft > 0) {
+                        playSound();
+                        if ('Notification' in window && Notification.permission === 'granted') {
+                            new Notification('Timer Complete!', {
+                                body: `${task.title} time is up!`,
+                                icon: '✅'
+                            });
+                        }
+                    }
+                    
+                    return { ...task, timeLeft: newTimeLeft };
+                }
+                return task;
+            });
+            
+            // Only update timer displays, not the whole page
+            if (hasChanges) {
+                updateTimerDisplays();
+            }
+        }, 1000);
+
+        function playSound() {
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE=');
+                audio.play().catch(() => {});
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+
+        function addTask() {
+            const titleInput = document.getElementById('taskTitle');
+            const hoursInput = document.getElementById('taskHours');
+            const minutesInput = document.getElementById('taskMinutes');
+            const secondsInput = document.getElementById('taskSeconds');
+            
+            if (!titleInput || !hoursInput || !minutesInput || !secondsInput) {
+                console.error('Input elements not found');
+                return;
+            }
+            
+            const title = titleInput.value.trim();
+            const hours = parseInt(hoursInput.value) || 0;
+            const minutes = parseInt(minutesInput.value) || 0;
+            const seconds = parseInt(secondsInput.value) || 0;
+            
+            if (!title) {
+                alert('Please enter a task title');
+                return;
+            }
+            
+            const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+            if (totalSeconds === 0) {
+                alert('Please set a time for the task');
+                return;
+            }
+            
+            const newTask = {
+                id: Date.now(),
+                title: title,
+                totalTime: totalSeconds,
+                timeLeft: totalSeconds,
+                isRunning: false,
+                notes: ''
+            };
+            
+            state.tasks.push(newTask);
+            
+            // Clear inputs
+            titleInput.value = '';
+            hoursInput.value = '0';
+            minutesInput.value = '25';
+            secondsInput.value = '0';
+            
+            render();
+        }
+
+        function toggleTimer(id) {
+            state.tasks = state.tasks.map(task =>
+                task.id === id ? { ...task, isRunning: !task.isRunning } : task
+            );
+            updateTimerDisplays();
+        }
+
+        function resetTimer(id) {
+            state.tasks = state.tasks.map(task =>
+                task.id === id ? { ...task, timeLeft: task.totalTime, isRunning: false } : task
+            );
+            state.halfwayAlerted.delete(id);
+            updateTimerDisplays();
+        }
+
+        function completeTask(id) {
+            state.tasks = state.tasks.map(task =>
+                task.id === id ? { ...task, timeLeft: 0, isRunning: false } : task
+            );
+            updateTimerDisplays();
+        }
+
+        function deleteTask(id) {
+            state.tasks = state.tasks.filter(task => task.id !== id);
+            state.halfwayAlerted.delete(id);
+            state.editingNoteId = null;
+            render();
+        }
+
+        function updateTaskNotes(id, notes) {
+            state.tasks = state.tasks.map(task =>
+                task.id === id ? { ...task, notes } : task
+            );
+        }
+
+        function toggleNoteEdit(id) {
+            state.editingNoteId = state.editingNoteId === id ? null : id;
+            render();
+        }
+
+        function toggleMiniMode() {
+            state.miniMode = !state.miniMode;
+            render();
+        }
+
+        function formatTime(seconds) {
+            const isNegative = seconds < 0;
+            const absSeconds = Math.abs(seconds);
+            const h = Math.floor(absSeconds / 3600);
+            const m = Math.floor((absSeconds % 3600) / 60);
+            const s = absSeconds % 60;
+            const timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            return isNegative ? `+${timeStr}` : timeStr;
+        }
+
+        function getProgressPercentage(task) {
+            if (task.timeLeft < 0) return 100;
+            return ((task.totalTime - task.timeLeft) / task.totalTime) * 100;
+        }
+
+        function getTimerClass(task) {
+            if (task.timeLeft < 0) return 'timer-overtime';
+            if (task.timeLeft === 0) return 'timer-complete';
+            if (task.isRunning) return 'timer-running';
+            return 'timer-idle';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Only update timer displays without re-rendering inputs
+        function updateTimerDisplays() {
+            state.tasks.forEach(task => {
+                const timerEl = document.getElementById(`timer-${task.id}`);
+                const progressEl = document.getElementById(`progress-${task.id}`);
+                const overtimeEl = document.getElementById(`overtime-${task.id}`);
+                const completeEl = document.getElementById(`complete-${task.id}`);
+                const controlBtn = document.getElementById(`control-${task.id}`);
+                
+                if (timerEl) {
+                    timerEl.textContent = formatTime(task.timeLeft);
+                    timerEl.className = `timer-display ${getTimerClass(task)}`;
+                }
+                
+                if (progressEl) {
+                    progressEl.style.width = `${getProgressPercentage(task)}%`;
+                    if (task.timeLeft < 0) {
+                        progressEl.classList.add('progress-fill-overtime');
+                    } else {
+                        progressEl.classList.remove('progress-fill-overtime');
+                    }
+                }
+                
+                if (overtimeEl) {
+                    overtimeEl.style.display = task.timeLeft < 0 ? 'block' : 'none';
+                }
+                
+                if (completeEl) {
+                    completeEl.style.display = (task.timeLeft === 0 && !task.isRunning) ? 'block' : 'none';
+                }
+
+                if (controlBtn) {
+                    if (task.isRunning) {
+                        controlBtn.className = 'control-btn pause-btn';
+                        controlBtn.innerHTML = '⏸️ Pause';
+                    } else {
+                        controlBtn.className = 'control-btn start-btn';
+                        controlBtn.innerHTML = '▶️ Start';
+                    }
+                }
+            });
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            
+            if (state.miniMode) {
+                const runningTasks = state.tasks.filter(task => task.isRunning || task.timeLeft !== task.totalTime);
+                
+                app.innerHTML = `
+                    <div class="mini-mode-container">
+                        <div class="mini-card">
+                            <div class="mini-header">
+                                <h2>Active Tasks</h2>
+                                <button class="maximize-btn" onclick="toggleMiniMode()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            ${runningTasks.length === 0 ? 
+                                '<p class="empty-state">No active tasks</p>' :
+                                `<div class="mini-tasks">
+                                    ${runningTasks.map(task => `
+                                        <div class="mini-task-card">
+                                            <div class="mini-task-header">
+                                                <h3 class="mini-task-title">${escapeHtml(task.title)}</h3>
+                                                <button class="mini-control-btn" onclick="toggleTimer(${task.id})">
+                                                    ${task.isRunning ? 
+                                                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>' :
+                                                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>'
+                                                    }
+                                                </button>
+                                            </div>
+                                            <div id="timer-${task.id}" class="mini-timer ${getTimerClass(task)}">
+                                                ${formatTime(task.timeLeft)}
+                                            </div>
+                                            ${task.timeLeft < 0 ? '<div class="mini-overtime-label">Overtime</div>' : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>`
+                            }
+                        </div>
+                    </div>
+                `;
+            } else {
+                app.innerHTML = `
+                    <div class="container">
+                        <div class="app-card">
+                            <div class="header">
+                                <h1>Task Timer</h1>
+                                ${state.tasks.length > 0 ? 
+                                    '<button class="mini-mode-btn" onclick="toggleMiniMode()">📱 Mini Mode</button>' : 
+                                    ''
+                                }
+                            </div>
+                            
+                            <div class="add-task-section">
+                                <h2>Add New Task</h2>
+                                <div class="input-group">
+                                    <input type="text" id="taskTitle" class="task-input" placeholder="Task title" onkeypress="if(event.key==='Enter') addTask()">
+                                </div>
+                                <div class="time-inputs">
+                                    <div class="time-input-group">
+                                        <label>Hours</label>
+                                        <input type="number" id="taskHours" min="0" max="99" value="0" maxlength="2" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2)">
+                                    </div>
+                                    <div class="time-input-group">
+                                        <label>Minutes</label>
+                                        <input type="number" id="taskMinutes" min="0" max="59" value="25" maxlength="2" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2); if(this.value > 59) this.value = 59">
+                                    </div>
+                                    <div class="time-input-group">
+                                        <label>Seconds</label>
+                                        <input type="number" id="taskSeconds" min="0" max="59" value="0" maxlength="2" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2); if(this.value > 59) this.value = 59">
+                                    </div>
+                                </div>
+                                <button class="add-btn" onclick="addTask()">➕ Add Task</button>
+                            </div>
+                            
+                            <div class="tasks-container">
+                                ${state.tasks.length === 0 ? 
+                                    '<div class="empty-state">No tasks yet. Add one to get started!</div>' :
+                                    state.tasks.map(task => `
+                                        <div class="task-card">
+                                            <div class="task-header">
+                                                <h3 class="task-title">${escapeHtml(task.title)}</h3>
+                                                <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️</button>
+                                            </div>
+                                            
+                                            <div id="timer-${task.id}" class="timer-display ${getTimerClass(task)}">
+                                                ${formatTime(task.timeLeft)}
+                                            </div>
+                                            
+                                            <div id="overtime-${task.id}" class="overtime-banner" style="display: ${task.timeLeft < 0 ? 'block' : 'none'}">
+                                                ⏱️ Overtime: Task exceeded planned time
+                                            </div>
+                                            
+                                            <div class="progress-bar">
+                                                <div id="progress-${task.id}" class="progress-fill ${task.timeLeft < 0 ? 'progress-fill-overtime' : ''}" 
+                                                     style="width: ${getProgressPercentage(task)}%">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="notes-section">
+                                                ${state.editingNoteId === task.id ? `
+                                                    <textarea class="notes-textarea" rows="3" 
+                                                              placeholder="Add notes about what you accomplished..."
+                                                              oninput="updateTaskNotes(${task.id}, this.value)">${escapeHtml(task.notes)}</textarea>
+                                                    <button class="save-note-btn" onclick="toggleNoteEdit(${task.id})">Save Note</button>
+                                                ` : task.notes ? `
+                                                    <div class="notes-display" onclick="toggleNoteEdit(${task.id})">${escapeHtml(task.notes)}</div>
+                                                ` : `
+                                                    <button class="notes-btn" onclick="toggleNoteEdit(${task.id})">
+                                                        📝 Add notes...
+                                                    </button>
+                                                `}
+                                            </div>
+                                            
+                                            <div class="task-controls">
+                                                <button id="control-${task.id}" class="control-btn ${task.isRunning ? 'pause-btn' : 'start-btn'}" 
+                                                        onclick="toggleTimer(${task.id})">
+                                                    ${task.isRunning ? '⏸️ Pause' : '▶️ Start'}
+                                                </button>
+                                                <button class="control-btn done-btn" onclick="completeTask(${task.id})">
+                                                    ✓ Done
+                                                </button>
+                                                <button class="control-btn reset-btn" onclick="resetTimer(${task.id})">
+                                                    🔄 Reset
+                                                </button>
+                                            </div>
+                                            
+                                            <div id="complete-${task.id}" class="complete-message" style="display: ${task.timeLeft === 0 && !task.isRunning ? 'block' : 'none'}">
+                                                ✓ Task Completed!
+                                            </div>
+                                        </div>
+                                    `).join('')
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
